@@ -5,7 +5,6 @@ module.exports = {
     entry: {
         content_script: path.resolve(__dirname, "src/contentScript.ts"),
         popup: path.resolve(__dirname, "src/popup.ts"),
-        //background: path.resolve(__dirname, "src/background.ts"),
     },
     output: {
         filename: "[name].js",

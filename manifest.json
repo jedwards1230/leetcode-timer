@@ -28,6 +28,6 @@
             "*://*.leetcode.com/problems/*"
         ],
         "default_title": "Leetcode Timer",
-        "default_popup": "main.html"
+        "default_popup": "dist/main.html"
     }
 }

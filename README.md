@@ -2,11 +2,13 @@
 
 A small web extension that automatically starts to time your leetcode problems. It will also automatically stop the timer when you finish a problem, and compare your current time against your average.
 
+![Screenshot](screenshot.png)
+
 ## Flow
 
 - Visiting ```*://*.leetcode.com/problems/*``` triggers the timer to begin
 - Timer is loaded as a content script for the page
-  - This allows different timers for different pages 
+  - This allows different timers for different pages
 - Opening the page action displays elapsed time from the content script
 
 ## Goal
@@ -23,6 +25,9 @@ A small web extension that automatically starts to time your leetcode problems. 
   - Get problem title
   - Get problem difficulty
   - Get problem url
+- Fix pause function
+  - Currently displays time based on start time.
+  - Gotta track how much time was spent paused and resume properly.
 - Store times per question and difficulty
   - localstorage? indexdb?
 - Color icon?
