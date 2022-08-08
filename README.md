@@ -22,9 +22,7 @@ A small web extension that automatically starts to time your leetcode problems. 
 ## Todo
 
 - Read page
-  - Get problem title
   - Get problem difficulty
-  - Get problem url
 - Fix pause function
   - Currently displays time based on start time.
   - Gotta track how much time was spent paused and resume properly.
