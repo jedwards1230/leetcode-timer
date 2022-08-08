@@ -45,21 +45,41 @@ const logError = (error: Error) => {
     console.error(error);
 }
 
+// request the start time from the content script
+const getTime = (tab: browser.tabs.Tab) => {
+    browser.tabs.sendMessage(tab.id!, {
+        from: 'popup',
+        cmd: 'get_time'
+    }).then((response: TimerCommand) => {
+        // assign start time to popup window
+        if (response.cmd === 'time_elapsed') {
+            startTime = response.startTime!;
+            elapsedTime = Date.now() - startTime;
+            document.getElementById('timerNow')!.innerText = formatTime(elapsedTime);
+        }
+    }).catch(logError).finally(startTimer);
+}
+
+const getTitle = (url: string) => {
+    const regex = /problems\/([^\/]+)\/*/;
+    const match = url.match(regex);
+    if (match) {
+        // clean up the title
+        let problemTitle = match[1] as string;
+        // remove dashes
+        problemTitle = problemTitle.replace(/-/g, ' ');
+        // capitalize first letters
+        problemTitle = problemTitle.split(' ').map(word => word[0]!.toUpperCase() + word.slice(1)).join(' ');
+        // render
+        document.getElementById('problemTitle')!.innerText = problemTitle;
+    }
+}
+
 // communicate with content script
 // this stores the start time so it can persist when page action window is closed
 const tabQuery = browser.tabs.query({ active: true, currentWindow: true });
 tabQuery.then((tabs) => {
     const tab = tabs[0]!;
-    // request the start time from the content script
-    browser.tabs.sendMessage(tab.id!, {
-        from: 'popup',
-        cmd: 'get_time'
-    }).then((response) => {
-        // assign start time to popup window
-        if (response.cmd === 'time_elapsed') {
-            startTime = response.startTime;
-            elapsedTime = Date.now() - startTime;
-            document.getElementById('timerNow')!.innerText = formatTime(elapsedTime);
-        }
-    }).catch(logError).finally(startTimer);
+    getTime(tab);
+    getTitle(tab.url!);
 });
