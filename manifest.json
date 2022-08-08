@@ -1,0 +1,33 @@
+{
+    "manifest_version": 2,
+    "name": "Leetcode Timer",
+    "version": "0.0.1",
+    "author": "Justin Edwards",
+    "description": "Web extension for timing LeetCode problems.",
+    "permissions": [
+        "activeTab",
+        "*://*.leetcode.com/problems/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.leetcode.com/problems/*"
+            ],
+            "js": [
+                "dist/content_script.js"
+            ]
+        }
+    ],
+    "page_action": {
+        "browser_style": true,
+        "default_icon": {
+            "19": "dist/icon-clock.svg",
+            "38": "dist/icon-clock.svg"
+        },
+        "show_matches": [
+            "*://*.leetcode.com/problems/*"
+        ],
+        "default_title": "Leetcode Timer",
+        "default_popup": "main.html"
+    }
+}
