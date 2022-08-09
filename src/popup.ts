@@ -47,10 +47,12 @@ const logError = (error: Error) => {
 
 // request the start time from the content script
 const getTime = (tab: browser.tabs.Tab) => {
-    browser.tabs.sendMessage(tab.id!, {
+    const message: TimerCommand = {
         from: 'popup',
         cmd: 'get_time'
-    }).then((response: TimerCommand) => {
+    }
+    
+    browser.tabs.sendMessage(tab.id!, message).then((response: TimerCommand) => {
         // assign start time to popup window
         if (response.cmd === 'time_elapsed') {
             startTime = response.startTime!;
