@@ -2,6 +2,10 @@ body {
   background: #fff;
   font-size: 1.1rem;
   border: #fafafa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -9,6 +13,16 @@ body {
     background: #181a1b;
     color: #cac6bf;
     border: #000;
+  }
+
+  button {
+    background: #374850;
+    color: #e8e6e3;
+    border: none;
+  }
+
+  button:hover {
+    background: #405159;
   }
 }
 
@@ -37,12 +51,12 @@ body {
   text-align: center;
 }
 
-.button {
-  padding: 14px 26px;
+button {
+  padding: 0.8rem 1.5rem;
   cursor: pointer;
 }
 
-.button:hover {
+button:hover {
   background: #ddd;
 }
 

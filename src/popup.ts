@@ -1,3 +1,5 @@
+import { getTitle } from "./utils";
+
 let elapsedTime = 0;
 let startTime = 0;
 let timerId: NodeJS.Timer;
@@ -51,7 +53,7 @@ const getTime = (tab: browser.tabs.Tab) => {
         from: 'popup',
         cmd: 'get_time'
     }
-    
+
     browser.tabs.sendMessage(tab.id!, message).then((response: TimerCommand) => {
         // assign start time to popup window
         if (response.cmd === 'time_elapsed') {
@@ -62,26 +64,15 @@ const getTime = (tab: browser.tabs.Tab) => {
     }).catch(logError).finally(startTimer);
 }
 
-const getTitle = (url: string) => {
-    const regex = /problems\/([^\/]+)\/*/;
-    const match = url.match(regex);
-    if (match) {
-        // clean up the title
-        let problemTitle = match[1] as string;
-        // remove dashes
-        problemTitle = problemTitle.replace(/-/g, ' ');
-        // capitalize first letters
-        problemTitle = problemTitle.split(' ').map(word => word[0]!.toUpperCase() + word.slice(1)).join(' ');
-        // render
-        document.getElementById('problemTitle')!.innerText = problemTitle;
-    }
-}
-
 // communicate with content script
 // this stores the start time so it can persist when page action window is closed
 const tabQuery = browser.tabs.query({ active: true, currentWindow: true });
 tabQuery.then((tabs) => {
     const tab = tabs[0]!;
     getTime(tab);
-    getTitle(tab.url!);
+
+    const pageTitle = getTitle(tab.url!);
+    // render
+    document.getElementById('problemTitle')!.innerText = pageTitle;
+
 });
