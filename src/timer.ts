@@ -22,12 +22,12 @@ class Timer {
         clearInterval(this.id);
     }
 
-    static printTime = (time: number, e: HTMLElement) => {
+    static toString = (time: number): string => {
         const hours = Math.floor(time / 3600);
         const minutes = Math.floor((time - hours * 3600) / 60);
         const seconds = time - hours * 3600 - minutes * 60;
         const timeStr = `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-        e.innerText = timeStr;
+        return timeStr;
     }
 }
 

@@ -3,7 +3,6 @@ import { parseTitle } from "./utils";
 
 let timerId: NodeJS.Timer;
 const problemTimer = new Timer();
-let avgTime = 0;
 
 // communicate with content script
 // this stores the start time so it can persist when page action window is closed
@@ -71,7 +70,7 @@ const startTimer = () => {
     const timerEl = document.getElementById('timerNow')!;
     problemTimer.start();
     timerId = setInterval(() => {
-        Timer.printTime(problemTimer.currentTime, timerEl);
+        timerEl.innerText = Timer.toString(problemTimer.currentTime);
     }, 1000);
 }
 
@@ -96,12 +95,11 @@ const getTime = (tab: browser.tabs.Tab) => {
             // update
             problemTimer.paused = (response.state === 'paused');
             problemTimer.currentTime = response.currentTime!;
-            avgTime = response.avgTime!;
             title.classList.add(response.difficulty!);
 
             // render times
-            if (avgTime > 0) Timer.printTime(avgTime, avgTimerEl);
-            Timer.printTime(problemTimer.currentTime, timerEl);
+            if (response.avgTime! > 0) avgTimerEl.innerText = Timer.toString(problemTimer.currentTime);
+            timerEl.innerText = Timer.toString(problemTimer.currentTime);
             setPauseButton();
         }
     }).catch(logError).finally(startTimer);
