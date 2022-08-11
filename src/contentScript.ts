@@ -19,10 +19,12 @@ const saveSubmission = () => {
         timestamp: Date.now(),
         time_elapsed: problemTimer.currentTime
     })
+
     avgTime = submissions.times.reduce((acc, curr) => acc + curr.time_elapsed, 0) / submissions.times.length;
 
     const saveSubmission: SaveSubmission = {}
-    saveSubmission[pageTitle] = JSON.stringify(submissions);
+    if (difficulty === '') getDifficulty();
+    saveSubmission[difficulty] = JSON.stringify(submissions);
     browser.storage.sync.set(saveSubmission);
 }
 
@@ -56,9 +58,9 @@ const checkLatestSubmission = () => {
 
 const getHistory = () => {
     // grab historic times for this problem
-    browser.storage.sync.get(pageTitle).then((result) => {
-        if (result[pageTitle]) {
-            const problem = JSON.parse(result[pageTitle]);
+    browser.storage.sync.get(difficulty).then((result) => {
+        if (result[difficulty]) {
+            const problem = JSON.parse(result[difficulty]);
             submissions.times = problem.times;
             avgTime = submissions.times.reduce((acc, curr) => acc + curr.time_elapsed, 0) / submissions.times.length;
         }
@@ -118,7 +120,6 @@ browser.runtime.onMessage.addListener((request: Message, _sender, _sendResponse)
     return
 });
 
-getHistory();
 problemTimer.start();
 
 // observe until react app loads test environment
@@ -126,11 +127,13 @@ const parent = document.getElementById('app') as HTMLElement;
 if (checkPageLoaded()) {
     listenForSubmission();
     getDifficulty();
+    getHistory();
 } else {
     const mutationObserver = new MutationObserver(() => {
         if (checkPageLoaded()) {
             listenForSubmission();
             getDifficulty();
+            getHistory();
             mutationObserver.disconnect();
         }
     });

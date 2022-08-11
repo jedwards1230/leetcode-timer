@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "LeetCode Timer",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "Justin Edwards",
     "description": "Web extension for timing LeetCode problems.",
     "permissions": [
@@ -33,7 +33,7 @@
     },
     "browser_specific_settings": {
         "gecko": {
-            "id": "jedwards1230@leetcode-timer",
+            "id": "jedwards1230@leetcodetimer",
             "strict_min_version": "90.0"
         }
     }

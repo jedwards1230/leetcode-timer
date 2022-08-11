@@ -98,7 +98,7 @@ const getTime = (tab: browser.tabs.Tab) => {
             title.classList.add(response.difficulty!);
 
             // render times
-            if (response.avgTime! > 0) avgTimerEl.innerText = Timer.toString(problemTimer.currentTime);
+            if (response.avgTime! > 0) avgTimerEl.innerText = Timer.toString(response.avgTime!);
             timerEl.innerText = Timer.toString(problemTimer.currentTime);
             setPauseButton();
         }
