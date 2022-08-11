@@ -38,7 +38,6 @@ jobs:
         uses: kewisch/action-web-ext@v1
         with:
           cmd: build
-          source: /
           filename: "{name}-{version}.xpi"
 
       - name: "Upload Artifact"
