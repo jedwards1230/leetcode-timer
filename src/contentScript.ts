@@ -1,8 +1,10 @@
-import { getTitle } from "./utils";
+import { parseTitle } from "./utils";
+import Timer from "./timer";
 
-let startTime = Date.now();
+const problemTimer = new Timer();
+const pageTitle: string = parseTitle(location.href)
 
-const pageTitle: string = getTitle(location.href)
+problemTimer.start();
 
 // save submission time to sync storage
 const saveSubmission = (time: Date) => {
@@ -46,14 +48,23 @@ const checkLatestSubmission = () => {
     mutationObserver.observe(parent, { childList: true, subtree: true });
 }
 
+// event listener for page
 browser.runtime.onMessage.addListener((request: TimerCommand, _sender, _sendResponse) => {
     if (request.cmd === 'get_time') {
         const response: TimerCommand = {
-            from: 'contentScript',
+            state: problemTimer.paused ? 'paused' : 'running',
             cmd: 'time_elapsed',
-            startTime: startTime
+            currentTime: problemTimer.currentTime
         }
         return Promise.resolve(response)
+    } else if (request.cmd === 'pause') {
+        console.log('pause');
+        problemTimer.pause();
+        problemTimer.currentTime = request.currentTime!;
+    } else if (request.cmd === 'resume') {
+        console.log('resume');
+        problemTimer.currentTime = request.currentTime!;
+        problemTimer.start();
     }
     return
 });

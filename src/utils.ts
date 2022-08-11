@@ -1,4 +1,4 @@
-export const getTitle = (url: string): string => {
+export const parseTitle = (url: string): string => {
     const regex = /problems\/([^\/]+)\/*/;
     const match = url.match(regex);
     let title = '';

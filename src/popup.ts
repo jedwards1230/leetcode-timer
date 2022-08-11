@@ -1,45 +1,76 @@
-import { getTitle } from "./utils";
+import Timer from "./timer";
+import { parseTitle } from "./utils";
 
-let elapsedTime = 0;
-let startTime = 0;
 let timerId: NodeJS.Timer;
-let paused = false;
+const problemTimer = new Timer();
 
-// given a number of seconds, return a string of the form "HH:MM:SS"
-const formatTime = (time: number) => {
-    time = Math.floor(time / 1000);
-    const hours = Math.floor(time / 3600);
-    const minutes = Math.floor((time - hours * 3600) / 60);
-    const seconds = time - hours * 3600 - minutes * 60;
-    return `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+// communicate with content script
+// this stores the start time so it can persist when page action window is closed
+const tabQuery = browser.tabs.query({ active: true, currentWindow: true });
+tabQuery.then((tabs) => {
+    const tab = tabs[0]!;
+    getTime(tab);
+
+    const pageTitle = parseTitle(tab.url!);
+    // render
+    document.getElementById('problemTitle')!.innerText = pageTitle;
+    return tab
+});
+
+// send message to content script to pause timer
+const pause = () => {
+    const message: TimerCommand = {
+        cmd: 'pause',
+        currentTime: problemTimer.currentTime
+    }
+
+    problemTimer.pause();
+    setPauseButton();
+    clearInterval(timerId);
+
+    tabQuery.then((tabs) => {
+        const tab = tabs[0]!;
+        browser.tabs.sendMessage(tab.id!, message);
+    });
+}
+
+// send message to content script to resume the timer
+const resume = () => {
+    const message: TimerCommand = {
+        cmd: 'resume',
+        currentTime: problemTimer.currentTime
+    }
+
+    setPauseButton();
+    problemTimer.paused = false;
+
+    tabQuery.then((tabs) => {
+        const tab = tabs[0]!;
+        const resumeCmd = browser.tabs.sendMessage(tab.id!, message);
+        resumeCmd.then(() => {
+            getTime(tab);
+        }).catch(logError);
+    }).catch(logError);
 }
 
 // Adjust pause button in popup window
 const setPauseButton = () => {
-    if (paused) {
+    if (problemTimer.paused) {
         document.getElementById('pause')!.innerText = 'Resume';
-        document.getElementById('pause')!.onclick = startTimer;
-        paused = false;
+        document.getElementById('pause')!.onclick = resume;
     } else {
         document.getElementById('pause')!.innerText = 'Pause';
         document.getElementById('pause')!.onclick = pause;
-        paused = true;
     }
-}
-
-// clear the timer
-// todo: record all pauses and timed intervals to calculate total time
-const pause = () => {
-    setPauseButton();
-    clearInterval(timerId);
 }
 
 // start timer loop
 const startTimer = () => {
-    setPauseButton();
+    if (problemTimer.paused) return
+    const timerEl = document.getElementById('timerNow')!;
+    problemTimer.start();
     timerId = setInterval(() => {
-        elapsedTime = Date.now() - startTime;
-        document.getElementById('timerNow')!.innerText = formatTime(elapsedTime);
+        Timer.printTime(problemTimer.currentTime, timerEl);
     }, 1000);
 }
 
@@ -50,29 +81,17 @@ const logError = (error: Error) => {
 // request the start time from the content script
 const getTime = (tab: browser.tabs.Tab) => {
     const message: TimerCommand = {
-        from: 'popup',
         cmd: 'get_time'
     }
 
     browser.tabs.sendMessage(tab.id!, message).then((response: TimerCommand) => {
         // assign start time to popup window
         if (response.cmd === 'time_elapsed') {
-            startTime = response.startTime!;
-            elapsedTime = Date.now() - startTime;
-            document.getElementById('timerNow')!.innerText = formatTime(elapsedTime);
+            const timerEl = document.getElementById('timerNow')!;
+            problemTimer.paused = (response.state === 'paused');
+            problemTimer.currentTime = response.currentTime!;
+            Timer.printTime(problemTimer.currentTime, timerEl);
+            setPauseButton();
         }
     }).catch(logError).finally(startTimer);
 }
-
-// communicate with content script
-// this stores the start time so it can persist when page action window is closed
-const tabQuery = browser.tabs.query({ active: true, currentWindow: true });
-tabQuery.then((tabs) => {
-    const tab = tabs[0]!;
-    getTime(tab);
-
-    const pageTitle = getTitle(tab.url!);
-    // render
-    document.getElementById('problemTitle')!.innerText = pageTitle;
-
-});

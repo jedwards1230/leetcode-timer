@@ -1,5 +1,5 @@
 type TimerCommand = {
-    from: string
     cmd: string
-    startTime?: number
+    state?: string
+    currentTime?: number
 }
