@@ -1,8 +1,9 @@
-type TimerCommand = {
+type Message = {
     cmd: string
     state?: string
     currentTime?: number
     avgTime?: number
+    difficulty?: string
 }
 
 type Problem = {

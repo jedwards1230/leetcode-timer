@@ -4,8 +4,8 @@ import Timer from "./timer";
 //browser.storage.sync.clear();
 
 let avgTime = 0;
+let difficulty = '';
 const problemTimer = new Timer();
-problemTimer.start();
 
 const pageTitle: string = parseTitle(location.href)
 const submissions: Problem = {
@@ -65,23 +65,53 @@ const getHistory = () => {
     }).catch(e => console.log(e));
 }
 
+const getDifficulty = () => {
+    const easy = parent.getElementsByClassName('css-14oi08n')[0] as HTMLElement;
+    if (easy) {
+        difficulty = 'easy';
+        return
+    }
+    const medium = parent.getElementsByClassName('css-dcmtd5')[0] as HTMLElement;
+    if (medium) {
+        difficulty = 'medium';
+        return
+    }
+    const hard = parent.getElementsByClassName('css-t42afm')[0] as HTMLElement;
+    if (hard) {
+        difficulty = 'hard';
+        return
+    }
+}
+
+const listenForSubmission = () => {
+    // search for submit button
+    const submitButton = parent.getElementsByClassName('submit__2ISl')[0] as HTMLElement;
+    if (submitButton) {
+        // assign listener to check submissions
+        submitButton.addEventListener('click', () => checkLatestSubmission());
+    }
+}
+
+const checkPageLoaded = (): boolean => {
+    const el = parent.getElementsByClassName('submit__2ISl')[0] as HTMLElement
+    return el ? true : false;
+}
+
 // event listener for page
-browser.runtime.onMessage.addListener((request: TimerCommand, _sender, _sendResponse) => {
+browser.runtime.onMessage.addListener((request: Message, _sender, _sendResponse) => {
     if (request.cmd === 'get_time') {
-        console.log(avgTime);
-        const response: TimerCommand = {
+        const response: Message = {
             state: problemTimer.paused ? 'paused' : 'running',
             cmd: 'time_elapsed',
             currentTime: problemTimer.currentTime,
-            avgTime: avgTime
+            avgTime: avgTime,
+            difficulty: difficulty
         }
         return Promise.resolve(response)
     } else if (request.cmd === 'pause') {
-        console.log('pause');
         problemTimer.pause();
         problemTimer.currentTime = request.currentTime!;
     } else if (request.cmd === 'resume') {
-        console.log('resume');
         problemTimer.currentTime = request.currentTime!;
         problemTimer.start();
     }
@@ -89,16 +119,20 @@ browser.runtime.onMessage.addListener((request: TimerCommand, _sender, _sendResp
 });
 
 getHistory();
+problemTimer.start();
 
 // observe until react app loads test environment
 const parent = document.getElementById('app') as HTMLElement;
-const mutationObserver = new MutationObserver(() => {
-    // search for submit button
-    const submitButton = parent.getElementsByClassName('submit__2ISl')[0] as HTMLElement;
-    if (submitButton) {
-        // assign listener to check submissions
-        submitButton.addEventListener('click', () => checkLatestSubmission());
-        mutationObserver.disconnect();
-    }
-});
-mutationObserver.observe(parent, { childList: true, subtree: true });
+if (checkPageLoaded()) {
+    listenForSubmission();
+    getDifficulty();
+} else {
+    const mutationObserver = new MutationObserver(() => {
+        if (checkPageLoaded()) {
+            listenForSubmission();
+            getDifficulty();
+            mutationObserver.disconnect();
+        }
+    });
+    mutationObserver.observe(parent, { childList: true, subtree: true });
+}

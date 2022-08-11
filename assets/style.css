@@ -15,6 +15,10 @@ body {
     border: #000;
   }
 
+  .header {
+    color: #fff;
+  }
+
   button {
     background: #374850;
     color: #e8e6e3;
@@ -63,4 +67,16 @@ button:hover {
 .buttonText {
   position: relative;
   margin-left: 28px
+}
+
+.easy {
+  color: #6abf6e;
+}
+
+.medium {
+  color: #e07823;
+}
+
+.hard {
+  color: #e73270
 }

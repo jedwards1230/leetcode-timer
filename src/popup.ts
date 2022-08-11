@@ -20,7 +20,7 @@ tabQuery.then((tabs) => {
 
 // send message to content script to pause timer
 const pause = () => {
-    const message: TimerCommand = {
+    const message: Message = {
         cmd: 'pause',
         currentTime: problemTimer.currentTime
     }
@@ -37,7 +37,7 @@ const pause = () => {
 
 // send message to content script to resume the timer
 const resume = () => {
-    const message: TimerCommand = {
+    const message: Message = {
         cmd: 'resume',
         currentTime: problemTimer.currentTime
     }
@@ -81,19 +81,25 @@ const logError = (error: Error) => {
 
 // request the start time from the content script
 const getTime = (tab: browser.tabs.Tab) => {
-    const message: TimerCommand = {
+    const message: Message = {
         cmd: 'get_time'
     }
 
-    browser.tabs.sendMessage(tab.id!, message).then((response: TimerCommand) => {
+    browser.tabs.sendMessage(tab.id!, message).then((response: Message) => {
         // assign start time to popup window
         if (response.cmd === 'time_elapsed') {
+            // grab necessary elements
             const timerEl = document.getElementById('timerNow')!;
             const avgTimerEl = document.getElementById('timerAvg')!;
+            const title = document.getElementById('problemTitle')!;
+
+            // update
             problemTimer.paused = (response.state === 'paused');
             problemTimer.currentTime = response.currentTime!;
             avgTime = response.avgTime!;
+            title.classList.add(response.difficulty!);
 
+            // render times
             if (avgTime > 0) Timer.printTime(avgTime, avgTimerEl);
             Timer.printTime(problemTimer.currentTime, timerEl);
             setPauseButton();
