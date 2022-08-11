@@ -2,6 +2,10 @@
 
 A small web extension that automatically starts to time your leetcode problems. It will also automatically stop the timer when you finish a problem, and compare your current time against your average.
 
+Pending approval in Firefox addon store.
+
+Note: Only tested on Firefox.
+
 ![Screenshot](screenshot.png)
 
 ## Flow
