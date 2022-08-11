@@ -11,20 +11,22 @@ body {
 .header {
   width: 100%;
   font-size: 1.5rem;
-  padding: 1rem 2.5rem 0;
+  padding: 0.9rem 1rem 0;
   text-align: center;
 }
 
 .problemTitle {
   width: 100%;
+  max-width: 20rem;
   font-size: 1.3rem;
-  padding: 1rem 2.5rem 0;
+  padding: 0.75rem 1rem 0;
   text-align: center;
+  word-wrap: normal;
 }
 
 .timers {
   width: 100%;
-  padding: 1rem 2.5rem;
+  padding: 0.5rem 1rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -35,11 +37,14 @@ button {
   margin: 1rem 0 0;
   padding: 0.6rem 1.3rem;
   cursor: pointer;
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
+  background: #374850;
+  color: #e8e6e3;
+  border: none;
 }
 
 button:hover {
-  background: #ddd;
+  background: #475961;
 }
 
 .easy {
@@ -63,15 +68,5 @@ button:hover {
 
   .header {
     color: #fff;
-  }
-
-  button {
-    background: #374850;
-    color: #e8e6e3;
-    border: none;
-  }
-
-  button:hover {
-    background: #475961;
   }
 }
