@@ -29,6 +29,7 @@ jobs:
         with:
           node-version: 16
       
+      - run: npm i
       - run: npm run build-release
       
       - name: "web-ext build"
