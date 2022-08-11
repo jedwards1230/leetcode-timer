@@ -6,15 +6,23 @@ A small web extension that automatically starts to time your leetcode problems. 
 
 ## Flow
 
-- Visiting ```*://*.leetcode.com/problems/*``` triggers the timer to begin
-- Timer is loaded as a content script for the page
-  - This allows different timers for different pages
-- Opening the page action displays elapsed time from the content script
+- Timer begins automatically when you load a problem page
+- Timer stops automatically upon new successful submission
+- Timer continues on bad submission
 
-## Goal
+## Build
 
-- Timer function
-  - Timer begins when problem is opened
-  - Timer ends when problem is marked solved
-- Log times per question and difficulty
-- View and compare current vs average times per question/difficulty
+Run webpack
+
+``` 
+npm run build
+npm run build-release # this is for minified code
+```
+
+Compress
+
+```
+web-ext build
+```
+
+Load zip file as browser addon
