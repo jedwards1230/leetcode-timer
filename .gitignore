@@ -23,6 +23,8 @@ lib-cov
 coverage
 *.lcov
 
+web-ext-artifacts
+
 # nyc test coverage
 .nyc_output
 
