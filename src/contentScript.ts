@@ -1,22 +1,29 @@
 import { parseTitle } from "./utils";
 import Timer from "./timer";
 
-const problemTimer = new Timer();
-const pageTitle: string = parseTitle(location.href)
+//browser.storage.sync.clear();
 
+let avgTime = 0;
+const problemTimer = new Timer();
 problemTimer.start();
 
+const pageTitle: string = parseTitle(location.href)
+const submissions: Problem = {
+    title: pageTitle,
+    times: []
+}
+
 // save submission time to sync storage
-const saveSubmission = (time: Date) => {
-    const submission: any = {};
-    submission[pageTitle] = time.toLocaleString()
-    browser.storage.sync.set(submission);
-    const test = browser.storage.sync.get(pageTitle);
-    test.then((res) => {
-        console.log('stored:', res);
-    }).catch((err) => {
-        console.log(err);
+const saveSubmission = () => {
+    submissions.times.push({
+        timestamp: Date.now(),
+        time_elapsed: problemTimer.currentTime
     })
+    avgTime = submissions.times.reduce((acc, curr) => acc + curr.time_elapsed, 0) / submissions.times.length;
+
+    const saveSubmission: SaveSubmission = {}
+    saveSubmission[pageTitle] = JSON.stringify(submissions);
+    browser.storage.sync.set(saveSubmission);
 }
 
 // check if latest submission is a pass or fail
@@ -33,12 +40,11 @@ const checkLatestSubmission = () => {
                 const success = row.getElementsByClassName('ac__35gz');
                 if (success.length > 0) {
                     console.log('success');
-                    const timeCol = row.querySelector('.time-column__1guG') as HTMLElement;
-                    const timeSubmitted = new Date(timeCol.innerText);
-                    saveSubmission(timeSubmitted);
+                    saveSubmission();
                 } else {
                     console.log('fail');
                 }
+                problemTimer.pause();
                 mutationObserver.disconnect();
             }
         }
@@ -48,13 +54,26 @@ const checkLatestSubmission = () => {
     mutationObserver.observe(parent, { childList: true, subtree: true });
 }
 
+const getHistory = () => {
+    // grab historic times for this problem
+    browser.storage.sync.get(pageTitle).then((result) => {
+        if (result[pageTitle]) {
+            const problem = JSON.parse(result[pageTitle]);
+            submissions.times = problem.times;
+            avgTime = submissions.times.reduce((acc, curr) => acc + curr.time_elapsed, 0) / submissions.times.length;
+        }
+    }).catch(e => console.log(e));
+}
+
 // event listener for page
 browser.runtime.onMessage.addListener((request: TimerCommand, _sender, _sendResponse) => {
     if (request.cmd === 'get_time') {
+        console.log(avgTime);
         const response: TimerCommand = {
             state: problemTimer.paused ? 'paused' : 'running',
             cmd: 'time_elapsed',
-            currentTime: problemTimer.currentTime
+            currentTime: problemTimer.currentTime,
+            avgTime: avgTime
         }
         return Promise.resolve(response)
     } else if (request.cmd === 'pause') {
@@ -69,16 +88,17 @@ browser.runtime.onMessage.addListener((request: TimerCommand, _sender, _sendResp
     return
 });
 
+getHistory();
 
 // observe until react app loads test environment
+const parent = document.getElementById('app') as HTMLElement;
 const mutationObserver = new MutationObserver(() => {
     // search for submit button
-    const submitButton = document.getElementsByClassName('submit__2ISl')[0] as HTMLElement;
+    const submitButton = parent.getElementsByClassName('submit__2ISl')[0] as HTMLElement;
     if (submitButton) {
         // assign listener to check submissions
         submitButton.addEventListener('click', () => checkLatestSubmission());
         mutationObserver.disconnect();
     }
-})
-const parent = document.getElementById('app') as HTMLElement;
+});
 mutationObserver.observe(parent, { childList: true, subtree: true });

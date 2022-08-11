@@ -3,6 +3,7 @@ import { parseTitle } from "./utils";
 
 let timerId: NodeJS.Timer;
 const problemTimer = new Timer();
+let avgTime = 0;
 
 // communicate with content script
 // this stores the start time so it can persist when page action window is closed
@@ -88,8 +89,12 @@ const getTime = (tab: browser.tabs.Tab) => {
         // assign start time to popup window
         if (response.cmd === 'time_elapsed') {
             const timerEl = document.getElementById('timerNow')!;
+            const avgTimerEl = document.getElementById('timerAvg')!;
             problemTimer.paused = (response.state === 'paused');
             problemTimer.currentTime = response.currentTime!;
+            avgTime = response.avgTime!;
+
+            if (avgTime > 0) Timer.printTime(avgTime, avgTimerEl);
             Timer.printTime(problemTimer.currentTime, timerEl);
             setPauseButton();
         }
