@@ -1,12 +1,14 @@
 {
-    "extends": "@sindresorhus/tsconfig",
-    "compilerOptions": {
-      "declaration": false,
-      "target": "es2020",
-      "outDir": "dist"
-    },
-    "include": [
-      "./src/**/*.ts",
-      "webpack.config.js"
-    ]
-  }
+  "extends": "@sindresorhus/tsconfig",
+  "compilerOptions": {
+    "declaration": false,
+    "sourceMap": true,
+    "target": "es2020",
+    "outDir": "dist",
+    "allowJs": true,
+  },
+  "include": [
+    "./src/**/*.ts",
+    "webpack.config.js"
+  ]
+}
