@@ -13,6 +13,10 @@ const submissions: Problem = {
     times: []
 }
 
+const setAvg = (arr: Entry[]) => {
+    avgTime = (arr.reduce((acc, curr) => acc + curr.time_elapsed, 0) / arr.length) | 0;
+}
+
 // save submission time to sync storage
 const saveSubmission = () => {
     submissions.times.push({
@@ -20,7 +24,7 @@ const saveSubmission = () => {
         time_elapsed: problemTimer.currentTime
     })
 
-    avgTime = submissions.times.reduce((acc, curr) => acc + curr.time_elapsed, 0) / submissions.times.length;
+    setAvg(submissions.times);
 
     const saveSubmission: SaveSubmission = {}
     if (difficulty === '') getDifficulty();
@@ -62,7 +66,7 @@ const getHistory = () => {
         if (result[difficulty]) {
             const problem = JSON.parse(result[difficulty]);
             submissions.times = problem.times;
-            avgTime = submissions.times.reduce((acc, curr) => acc + curr.time_elapsed, 0) / submissions.times.length;
+            setAvg(submissions.times);
         }
     }).catch(e => console.log(e));
 }

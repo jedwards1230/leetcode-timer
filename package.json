@@ -1,12 +1,12 @@
 {
     "name": "leetcode-timer",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Web extension for timing LeetCode problems",
     "webExt": {
         "verbose": true
     },
     "scripts": {
-        "start": "web-ext run -p default-release",
+        "start": "web-ext run -p default",
         "watch": "webpack -w --mode development",
         "build": "webpack -c webpack.config.js --mode development",
         "build-release": "webpack -c webpack.config.js --mode production"
